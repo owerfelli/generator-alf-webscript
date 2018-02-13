@@ -6,6 +6,9 @@ const filters = require('generator-alfresco-common').prompt_filters;
 const LANGUAGES = ['Java', 'JavaScript', 'Both Java & JavaScript'];
 const METHODS = ['get', 'post', 'put', 'delete'];
 const TEMPLATE_FORMATS = ['html', 'json', 'xml', 'csv', 'atom', 'rss'];
+const FORMAT_SELECTORS = ['any', 'argument', 'extension'];
+const AUTHENTICATIONS = ['none', 'guest', 'user', 'admin'];
+
 
 var Generator = require('yeoman-generator');
 
@@ -32,32 +35,7 @@ module.exports = class extends Generator {
                 commonFilter: idFilter,
                 valueRequired: true,
             },
-            {
-                type: 'input',
-                name: 'shortname',
-                option: { name: 'shortname', config: { alias: 's', desc: 'Shortname for webscript', type: String } },
-                message: 'What ' + chalk.yellow('<shortname>') + ' should we use?',
-                invalidMessage: 'The ' + chalk.yellow('shortname') + ' element is required',
-                commonFilter: filters.requiredTextFilter,
-                valueRequired: true,
-            },
-            {
-                type: 'input',
-                name: 'description',
-                option: { name: 'description', config: { alias: 'd', desc: 'Description for webscript', type: String } },
-                message: 'What ' + chalk.yellow('<description>') + ' should we use?',
-                commonFilter: filters.optionalTextFilter,
-                valueRequired: false,
-            },
-            {
-                type: 'input',
-                name: 'urlTemplates',
-                option: { name: 'url-templates', config: { alias: 'u', desc: 'Vertical bar \'|\' separated list of url templates', type: String } },
-                message: 'Provide a ' + chalk.green('|') + ' separated list of ' + chalk.yellow('<url>') + ' values',
-                invalidMessage: 'At least one ' + chalk.yellow('url') + ' is required',
-                commonFilter: urlTemplatesFilter,
-                valueRequired: true,
-            },
+
             {
                 type: 'list',
                 name: 'language',
@@ -88,6 +66,61 @@ module.exports = class extends Generator {
                 invalidMessage: 'You must specify at least one template format',
                 commonFilter: filters.requiredTextListFilterFactory(',', TEMPLATE_FORMATS),
                 valueRequired: false,
+            }, {
+                type: 'input',
+                name: 'shortname',
+                option: { name: 'shortname', config: { alias: 's', desc: 'Shortname for webscript', type: String } },
+                message: 'What ' + chalk.yellow('<shortname>') + ' should we use?',
+                invalidMessage: 'The ' + chalk.yellow('shortname') + ' element is required',
+                commonFilter: filters.requiredTextFilter,
+                valueRequired: true,
+            },
+            {
+                type: 'input',
+                name: 'description',
+                option: { name: 'description', config: { alias: 'd', desc: 'Description for webscript', type: String } },
+                message: 'What ' + chalk.yellow('<description>') + ' should we use?',
+                commonFilter: filters.optionalTextFilter,
+                valueRequired: false,
+            },
+            {
+                type: 'input',
+                name: 'urlTemplates',
+                option: { name: 'url-templates', config: { alias: 'u', desc: 'Vertical bar \'|\' separated list of url templates', type: String } },
+                message: 'Provide a ' + chalk.green('|') + ' separated list of ' + chalk.yellow('<url>') + ' values',
+                invalidMessage: 'At least one ' + chalk.yellow('url') + ' is required',
+                commonFilter: urlTemplatesFilter,
+                valueRequired: true,
+            },
+            {
+                type: 'list',
+                name: 'formatSelector',
+                option: { name: 'format-selector', config: { alias: 'f', desc: 'Format selection technique: any, argument or extension', type: String } },
+
+                choices: FORMAT_SELECTORS,
+                message: 'How will the ' + chalk.yellow('<format>') + ' be specified?',
+                commonFilter: filters.chooseOneStartsWithFilterFactory(FORMAT_SELECTORS),
+                valueRequired: true,
+            },
+            {
+                type: 'list',
+                name: 'formatDefault',
+                option: { name: 'format-default', config: { alias: 'F', desc: 'Default format to use if no selection is made', type: String } },
+                choices: readonlyProps => {
+                    return (readonlyProps.templateFormats || this.answerOverrides.templateFormats);
+                },
+                message: 'Which <format ' + chalk.yellow('@default') + '> should we use?',
+                valueRequired: false,
+                // We can't use commonFilter here because it requires variable input (the list of values)
+            },
+            {
+                type: 'list',
+                name: 'authentication',
+                option: { name: 'authentication', config: { alias: 'a', desc: 'Type of authentication required: none, guest, user or admin', type: String } },
+                choices: AUTHENTICATIONS,
+                message: 'What level of ' + chalk.yellow('<authentication>') + ' is required to run the webscript?',
+                commonFilter: filters.chooseOneStartsWithFilterFactory(AUTHENTICATIONS),
+                valueRequired: true,
             }
 
         ]).then((answers) => {
@@ -110,14 +143,14 @@ function idFilter(id) {
     return retv;
 }
 
-function urlTemplatesFilter (templates) {
+function urlTemplatesFilter(templates) {
     const urls = filters.requiredTextListFilter(templates, '|');
     if (urls) {
-      return urls.map(url => {
-        return (url.startsWith('/')
-          ? url
-          : '/' + url);
-      });
+        return urls.map(url => {
+            return (url.startsWith('/')
+                ? url
+                : '/' + url);
+        });
     }
     return urls;
-  }
+}
