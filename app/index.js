@@ -1,7 +1,8 @@
 'use strict';
 
+const _ = require('lodash');
 const chalk = require('chalk');
-const filters = require('generator-alfresco-common').prompt_filters;
+const filters = require('./prompt_filters.js');
 
 const LANGUAGES = ['Java', 'JavaScript', 'Both Java & JavaScript'];
 const METHODS = ['get', 'post', 'put', 'delete'];
@@ -121,13 +122,53 @@ module.exports = class extends Generator {
                 message: 'What level of ' + chalk.yellow('<authentication>') + ' is required to run the webscript?',
                 commonFilter: filters.chooseOneStartsWithFilterFactory(AUTHENTICATIONS),
                 valueRequired: true,
+            },
+            {
+                type: 'input',
+                name: 'authenticationRunas',
+                option: { name: 'authentication-runas', config: { alias: 'r', desc: 'User webscript should run as', type: String } },
+                message: 'Which user should the webscript <authentication ' + chalk.yellow('@runas') + '>? (leave empty for the calling user)',
+                commonFilter: filters.optionalTextFilter,
+                valueRequired: false,
             }
 
         ]).then((answers) => {
-            this.log(answers.id)
-            this.log(answers.language)
-            this.log(answers.methods)
-            this.log(answers.templateFormats)
+            answers.methods.forEach(method => {
+                const descName = answers.id + '.' + method + '.desc.xml';
+                this.fs.copyTpl(this.templatePath('desc.xml'), this.destinationPath(descName), answers);
+
+                answers.templateFormats.forEach(format => {
+                    const fmtPath = this.templatePath(format + '.ftl');
+                    const tplName = answers.id + '.' + method + '.' + format + '.ftl';
+                    this.fs.copyTpl(fmtPath, tplName, answers);
+                });
+
+                ['en', 'ar', 'fr'].forEach(locale => {
+                    const propPath = this.templatePath(locale + '.properties');
+                    const localeName = answers.id + '.' + method + (locale === 'en' ? '' : '_' + locale) + '.properties';
+                    this.fs.copyTpl(propPath, localeName, answers);
+                });
+                const javaSrcPath = this.templatePath('DeclarativeWebScript.java');
+                const jsSrcPath = this.templatePath('controller.js');
+                const wsSrcPath = this.templatePath('webscript-context.xml');
+                if (answers.language !== 'Java') {
+                    const jsControllerName = answers.id + '.' + method + '.js';
+                    this.fs.copyTpl(jsSrcPath, jsControllerName, answers);
+                }
+
+                if (answers.language !== 'JavaScript') {
+                    answers.className = _.upperFirst(_.camelCase(answers.id)) + _.upperFirst(method);
+                    answers.qualifiedClassName = answers.classPackage + '.' + answers.className;
+                    answers.beanId = 'webscript.packageName' + answers.id + '.' + method;
+                    const javaControllerName = answers.className + '.java';
+                    this.log('Generating ' + javaControllerName);
+                    this.fs.copyTpl(javaSrcPath, javaControllerName, answers);
+
+                    const contextName = 'webscript-' + answers.id + '-' + method + '-context.xml';
+                    this.log('Generating ' + contextName);
+                    this.fs.copyTpl(wsSrcPath, contextName, answers);
+                }
+            });
         });
     }
 

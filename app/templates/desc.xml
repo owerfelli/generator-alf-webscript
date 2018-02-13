@@ -1,3 +1,24 @@
+<%
+function optionalAttribute(prop, attrName) {
+  if(prop) {
+    %> <%- attrName %>="<%- prop %>"<%
+  }
+}
+-%>
+<%
+function isEmpty(value) {
+  for (var key in value) {
+    if (hasOwnProperty.call(value, key)) {
+      return false;
+    }
+  }
+  return true;
+}
+-%>
 <webscript>
-    <title><%= title %></title>
+	<shortname><%- shortname %></shortname>
+	<description><%- description %></description>
+	<url><%- urlTemplates %></url>
+	<format<% optionalAttribute(formatDefault, 'default') %>><%- formatSelector %></format>
+	<authentication<% optionalAttribute(authenticationRunas, 'runas') %>><%- authentication %></authentication>
 </webscript>
