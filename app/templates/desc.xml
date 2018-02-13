@@ -1,0 +1,3 @@
+<webscript>
+    <title><%= title %></title>
+</webscript>
