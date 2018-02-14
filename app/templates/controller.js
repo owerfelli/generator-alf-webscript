@@ -1,3 +1,8 @@
 
-model.data = 'Facts and statistics collected together for reference or analysis.'.toLocaleLowerCase();
+var <%- id %> = {
+	id : "<%- className %>",
+	name : "Vneuron.<%- className %>"
+	
+}
 
+model.widgets = [<%- id %>]

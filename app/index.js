@@ -104,6 +104,10 @@ module.exports = class extends Generator {
             },
             {
                 type: 'confirm',
+                when: function (response) {
+
+                    return (response.templateFormats.includes("html") && response.language!== 'Java');
+                },
                 name: 'confirmYui',
                 message: 'would you like to ingect ' + chalk.yellow('YUI') + ' component ?'
             }
@@ -127,13 +131,13 @@ module.exports = class extends Generator {
                 const javaSrcPath = this.templatePath('DeclarativeWebScript.java');
                 const jsSrcPath = this.templatePath('controller.js');
                 const wsSrcPath = this.templatePath('webscript-context.xml');
+                answers.className = _.upperFirst(_.camelCase(answers.id)) + _.upperFirst(method);
                 if (answers.language !== 'Java') {
                     const jsControllerName = answers.id + '.' + method + '.js';
                     this.fs.copyTpl(jsSrcPath, jsControllerName, answers);
                 }
 
                 if (answers.language !== 'JavaScript') {
-                    answers.className = _.upperFirst(_.camelCase(answers.id)) + _.upperFirst(method);
                     answers.qualifiedClassName = answers.classPackage + '.' + answers.className;
                     answers.beanId = 'webscript.packageName' + answers.id + '.' + method;
                     const javaControllerName = answers.className + '.java';
