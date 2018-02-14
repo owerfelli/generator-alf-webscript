@@ -2,7 +2,6 @@
 
 const _ = require('lodash');
 const chalk = require('chalk');
-const filters = require('./prompt_filters.js');
 
 const LANGUAGES = ['Java', 'JavaScript', 'Both Java & JavaScript'];
 const METHODS = ['get', 'post', 'put', 'delete'];
@@ -31,10 +30,7 @@ module.exports = class extends Generator {
                 type: 'input',
                 name: 'id',
                 option: { name: 'id', config: { alias: 'i', desc: 'Webscript id', type: String } },
-                message: 'What ' + chalk.yellow('webscript id') + ' should we use?',
-                invalidMessage: 'The ' + chalk.yellow('webscript id') + ' value is required',
-                commonFilter: idFilter,
-                valueRequired: true,
+                message: 'What ' + chalk.yellow('webscript id') + ' should we use?'
             },
 
             {
@@ -42,9 +38,7 @@ module.exports = class extends Generator {
                 name: 'language',
                 option: { name: 'language', config: { alias: 'l', desc: 'Language for webscript: java, javascript or both', type: String } },
                 choices: LANGUAGES,
-                message: 'Which language would you like to develop your script in?',
-                commonFilter: filters.chooseOneMapStartsWithFilterFactory({ java: 'Java', javascript: 'JavaScript', both: 'Both Java & JavaScript' }),
-                valueRequired: true,
+                message: 'Which language would you like to develop your script in?'
             },
             {
                 type: 'checkbox',
@@ -52,10 +46,7 @@ module.exports = class extends Generator {
                 option: { name: 'methods', config: { alias: 'M', desc: 'A comma separated list of: get, put, post and/or delete', type: String } },
                 choices: METHODS,
                 default: ['get'],
-                message: 'Which HTTP methods would you like to support?',
-                invalidMessage: 'You must specify at least one method',
-                commonFilter: filters.requiredTextListFilterFactory(',', METHODS),
-                valueRequired: true,
+                message: 'Which HTTP methods would you like to support?'
             },
             {
                 type: 'checkbox',
@@ -63,45 +54,31 @@ module.exports = class extends Generator {
                 option: { name: 'template-formats', config: { alias: 't', desc: 'A comma separated list of: html, json, xml, csv, atom and/or rss', type: String } },
                 choices: TEMPLATE_FORMATS,
                 default: ['html'],
-                message: 'Which response formats would you like to support?',
-                invalidMessage: 'You must specify at least one template format',
-                commonFilter: filters.requiredTextListFilterFactory(',', TEMPLATE_FORMATS),
-                valueRequired: false,
+                message: 'Which response formats would you like to support?'
             }, {
                 type: 'input',
                 name: 'shortname',
                 option: { name: 'shortname', config: { alias: 's', desc: 'Shortname for webscript', type: String } },
-                message: 'What ' + chalk.yellow('<shortname>') + ' should we use?',
-                invalidMessage: 'The ' + chalk.yellow('shortname') + ' element is required',
-                commonFilter: filters.requiredTextFilter,
-                valueRequired: true,
+                message: 'What ' + chalk.yellow('<shortname>') + ' should we use?'
             },
             {
                 type: 'input',
                 name: 'description',
                 option: { name: 'description', config: { alias: 'd', desc: 'Description for webscript', type: String } },
-                message: 'What ' + chalk.yellow('<description>') + ' should we use?',
-                commonFilter: filters.optionalTextFilter,
-                valueRequired: false,
+                message: 'What ' + chalk.yellow('<description>') + ' should we use?'
             },
             {
                 type: 'input',
                 name: 'urlTemplates',
                 option: { name: 'url-templates', config: { alias: 'u', desc: 'Vertical bar \'|\' separated list of url templates', type: String } },
-                message: 'Provide a ' + chalk.green('|') + ' separated list of ' + chalk.yellow('<url>') + ' values',
-                invalidMessage: 'At least one ' + chalk.yellow('url') + ' is required',
-                commonFilter: urlTemplatesFilter,
-                valueRequired: true,
+                message: 'Provide an ' + chalk.yellow('<url>') + ' value'
             },
             {
                 type: 'list',
                 name: 'formatSelector',
                 option: { name: 'format-selector', config: { alias: 'f', desc: 'Format selection technique: any, argument or extension', type: String } },
-
                 choices: FORMAT_SELECTORS,
-                message: 'How will the ' + chalk.yellow('<format>') + ' be specified?',
-                commonFilter: filters.chooseOneStartsWithFilterFactory(FORMAT_SELECTORS),
-                valueRequired: true,
+                message: 'How will the ' + chalk.yellow('<format>') + ' be specified?'
             },
             {
                 type: 'list',
@@ -110,26 +87,20 @@ module.exports = class extends Generator {
                 choices: readonlyProps => {
                     return (readonlyProps.templateFormats || this.answerOverrides.templateFormats);
                 },
-                message: 'Which <format ' + chalk.yellow('@default') + '> should we use?',
-                valueRequired: false,
-                // We can't use commonFilter here because it requires variable input (the list of values)
+                message: 'Which <format ' + chalk.yellow('@default') + '> should we use?'
             },
             {
                 type: 'list',
                 name: 'authentication',
                 option: { name: 'authentication', config: { alias: 'a', desc: 'Type of authentication required: none, guest, user or admin', type: String } },
                 choices: AUTHENTICATIONS,
-                message: 'What level of ' + chalk.yellow('<authentication>') + ' is required to run the webscript?',
-                commonFilter: filters.chooseOneStartsWithFilterFactory(AUTHENTICATIONS),
-                valueRequired: true,
+                message: 'What level of ' + chalk.yellow('<authentication>') + ' is required to run the webscript?'
             },
             {
                 type: 'input',
                 name: 'authenticationRunas',
                 option: { name: 'authentication-runas', config: { alias: 'r', desc: 'User webscript should run as', type: String } },
-                message: 'Which user should the webscript <authentication ' + chalk.yellow('@runas') + '>? (leave empty for the calling user)',
-                commonFilter: filters.optionalTextFilter,
-                valueRequired: false,
+                message: 'Which user should the webscript <authentication ' + chalk.yellow('@runas') + '>? (leave empty for the calling user)'
             }
 
         ]).then((answers) => {
@@ -176,22 +147,3 @@ module.exports = class extends Generator {
 
 };
 
-function idFilter(id) {
-    if (!_.isString(id)) return undefined;
-    const retv = _.kebabCase(id);
-    // if after kebabbing our id we don't have anything left treat as undefined
-    if (_.isEmpty(retv)) return undefined;
-    return retv;
-}
-
-function urlTemplatesFilter(templates) {
-    const urls = filters.requiredTextListFilter(templates, '|');
-    if (urls) {
-        return urls.map(url => {
-            return (url.startsWith('/')
-                ? url
-                : '/' + url);
-        });
-    }
-    return urls;
-}
