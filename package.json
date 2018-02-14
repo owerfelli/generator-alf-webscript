@@ -21,7 +21,9 @@
         "yeoman-generator",
         "scaffold",
         "generator",
-        "framework"
+        "framework",
+        "alfresco",
+        "webscript"
     ],
     "bugs": {
         "url": "https://github.com/owerfelli/generator-alf-webscript/issues"
