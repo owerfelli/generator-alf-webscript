@@ -101,6 +101,11 @@ module.exports = class extends Generator {
                 name: 'authenticationRunas',
                 option: { name: 'authentication-runas', config: { alias: 'r', desc: 'User webscript should run as', type: String } },
                 message: 'Which user should the webscript <authentication ' + chalk.yellow('@runas') + '>? (leave empty for the calling user)'
+            },
+            {
+                type: 'confirm',
+                name: 'confirmYui',
+                message: 'would you like to ingect ' + chalk.yellow('YUI') + ' component ?'
             }
 
         ]).then((answers) => {
