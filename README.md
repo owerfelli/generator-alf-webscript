@@ -25,7 +25,7 @@ npm install -g generator-alf-webscript
 ```
 
 Using
-
+in your directory run 
 ```bash
 yo alf-webscript
 ```
