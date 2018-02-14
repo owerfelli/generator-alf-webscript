@@ -29,3 +29,4 @@ Using
 ```bash
 yo alf-webscript
 ```
+This will ask you a number of questions and then generate webscript(s) based on your answers
