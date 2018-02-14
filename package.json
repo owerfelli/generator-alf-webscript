@@ -17,6 +17,12 @@
         "loadash": "^1.0.0",
         "yeoman-generator": "^2.0.2"
     },
+    "keywords": [
+        "yeoman-generator",
+        "scaffold",
+        "generator",
+        "framework"
+    ],
     "bugs": {
         "url": "https://github.com/owerfelli/generator-alf-webscript/issues"
     },
