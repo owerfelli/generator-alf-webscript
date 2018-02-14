@@ -1,16 +1,24 @@
 {
-  "name": "generator-alf-webscript",
-  "version": "1.0.0",
-  "description": "Alfresco webscript generator",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Oussama Werfelli",
-  "license": "ISC",
-  "dependencies": {
-    "chalk": "^2.3.1",
-    "loadash": "^1.0.0",
-    "yeoman-generator": "^2.0.2"
-  }
+    "name": "generator-alf-webscript",
+    "version": "1.0.0",
+    "description": "Alfresco webscript generator",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/owerfelli/generator-alf-webscript.git"
+    },
+    "author": "Oussama Werfelli",
+    "license": "MIT",
+    "dependencies": {
+        "chalk": "^2.3.1",
+        "loadash": "^1.0.0",
+        "yeoman-generator": "^2.0.2"
+    },
+    "bugs": {
+        "url": "https://github.com/owerfelli/generator-alf-webscript/issues"
+    },
+    "homepage": "https://github.com/owerfelli/generator-alf-webscript#readme"
 }
